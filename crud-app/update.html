@@ -1,0 +1,152 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MEAN Stack CRUD App</title>
+</head>
+
+<body>
+
+	<!-- start header navigation bar -->
+	<div class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#headbar" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand whiteText" href="#"><strong>MeanStack CRUD App</strong></a>
+			</div>
+			<div class="collapse navbar-collapse" id="headbar">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a class="whiteText" href="/insertData">Insert<span></a></li>
+					<li><a class="whiteText" href="/retrieveData">Retrieve </a></li>
+					<li><a class="whiteText" href="/deleteData">Delete</a></li>
+					<li><a class="whiteText" href="/updateData">Update</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="submitDiv1" class="container" style="padding: 15px; padding-top: 2px">
+		<form id="takeID" name="studentForm">
+
+			<div class="form-group has-feedback">
+				<input type="text" id="sEmail" name="sEmail" class="form-control" placeholder="Enter Email Address" onblur="checkEmailEmpty()">
+				<i class="glyphicon glyphicon-tags form-control-feedback"></i>
+			</div>
+			<div id="data" style="display:none">
+				<div class="form-group has-feedback">
+					<input type="text" id="sName" name="sName" class="form-control" placeholder="Enter Your Name" onblur="checkNameEmpty();">
+					<i class="glyphicon glyphicon-tags form-control-feedback"></i>
+				</div>
+
+
+				<div class="form-group has-feedback">
+					<input type="text" id="sPhoneNumber" name="sPhone" class="form-control" placeholder="Enter Phone Number" onkeypress="return IsNumeric(event);" onBlur="checkPhoneEmpty()">
+					<i class="glyphicon glyphicon-tags form-control-feedback"></i>
+				</div>
+
+				<div class="form-group has-feedback">
+					<textarea class="form-control" id="sAddress" name="sAddress" placeholder="Enter Address" onBlur="checkAddressEmpty()" ></textarea>
+					<i cslass="glyphicon glyphicon-tags form-control-feedback"></i>
+				</div>
+
+				<div class="form-group has-feedback">
+					<select id="sDepartment" name="sDepartment" class="form-control" onblur="hideResult()"  onchange="checkDepartmentEmpty()">
+						<option value="">Select Department</option>
+						<option value="cse">CSE</option>
+						<option value="ece">ECE</option>
+						<option value="eee">EEE</option>
+						<option value="mech">MECH</option>
+						<option value="other">OTHER</option>
+					</select>
+				</div>
+			</div>
+
+			<div id="result" class="alert alert-danger" style="display:none">
+				<strong>Alert!</strong> Please fill all form fields.
+			</div>
+
+			<!-- Error/Success response fields -->
+			<div id="error" class="alert alert-danger" style="display:none">
+				<strong>Error!</strong>
+			</div>
+			<div id="success" class="alert alert-success" style="display:none">
+				<strong>Success!</strong>
+			</div>
+
+			<div class="text-center">
+				<ul class="pagination pagination-lg">
+					<li class="pageBtn"><a id="getData" href="#">Get Data &nbsp<span class="glyphicon glyphicon-thumbs-up"></span></a></li>
+					<li><a id="submit" href="#">Submit &nbsp<span class="glyphicon glyphicon-thumbs-up"></span></a></li>
+				</ul>
+			</div>
+
+
+
+	</div>
+	</form>
+
+	<!-- loading external css files -->
+	<link href="css/bootstrap.css" rel="stylesheet">
+
+	<!-- loading external js files -->
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="js/validations.js"></script>
+	<script>
+		$("#getData").click(function() {
+			hideResult();
+			hideResponses();
+			if (checkEmail()) {
+				var formData = {
+					'sEmail': $('#sEmail').val()
+				};
+				console.log(formData);
+
+				$.get("/api/retrieveById", formData, function(response) {
+					hideData();
+					if (response.error == undefined) {
+
+						showData(JSON.stringify(response.result))
+					} else {
+						showError(response.error)
+					}
+
+				});
+
+			} else {
+				showResult("Please enter valid Email address");
+			}
+		});
+		$("#submit").click(function() {
+			hideResult();
+			hideResponses();
+			if (validate()) {
+				var formData = {
+					'sName': $('#sName').val(),
+					'sEmail': $('#sEmail').val(),
+					'sAddress': $('#sAddress').val(),
+					'sPhoneNumber': $('#sPhoneNumber').val(),
+					'sDepartment': $('#sDepartment').val()
+				};
+				console.log(formData);
+
+				$.post("http://localhost:7000/api/update", formData, function(response) {
+					hideData();
+					if (response.error == undefined)
+						showSuccess(response.result)
+					else {
+						showError(response.error)
+					}
+				});
+
+				return false;
+			}
+
+		});
+	</script>
+</body>
+
+</html>
